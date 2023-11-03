@@ -1,0 +1,30 @@
+{% extends "guide/base.html" %}
+
+{% block content %}
+
+{% if request.user.is_authenticated and not request.user.ref_signUp %}
+
+<form action="{% url 'ref' %}" method="post">
+    {% csrf_token %}
+
+    {{form.as_p}}
+
+    <button type="submit">Ввод</button>
+</form>
+
+{% else %}
+
+<h1>Вы уже активировали</h1>
+<h1><a href="{% url 'home' %}">Домой</a></h1>
+
+{% endif %}
+
+<script>
+
+    head = document.querySelector(".head");
+
+    head.hidden = true
+
+</script>
+
+{% endblock %}

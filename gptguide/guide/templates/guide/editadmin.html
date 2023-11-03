@@ -1,0 +1,41 @@
+{% extends "guide/base.html" %}
+{% load static %}
+
+{% block content %}
+
+
+{% if request.user.username == "admin" %}
+    <form action="{% url 'edit-admin' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="admin-form">
+            {{ form.as_ul }}
+        </div>
+    <button type="submit">Ввод</button>
+    <div class="btns">
+        {% for work in workpiece %}
+            <p class="btn-work-piece">{{work.text}}</p>
+        {% endfor %}
+    </div>
+</form>
+{% endif %}
+
+<script>
+    let btns = document.querySelectorAll(".btn-work-piece");
+    let instruction = document.querySelector(".instruction");
+
+    btns.forEach(btn => btn.addEventListener("click", function () {
+        instruction.value += btn.innerText
+    }))
+</script>
+
+<script>
+
+    head = document.querySelector(".head");
+
+    head.hidden = true
+
+</script>
+
+{% endblock %}
+
+

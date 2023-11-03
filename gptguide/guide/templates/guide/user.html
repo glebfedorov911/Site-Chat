@@ -1,0 +1,34 @@
+{% extends "guide/base.html" %}
+
+{% block content %}
+
+{% if request.user.id == user.id %}
+
+<h2>Доступные сообщения: {{user.msg}}</h2>
+<a href="{% url 'rate' %}">Пополнить баланс</a>
+{% if not request.user.ref_code and not request.user.ref %}
+    <form action="{% url 'generate-code' %}" method="POST">
+        {% csrf_token %}
+        <button>Сгенерировать код</button>
+    </form>
+{% else %}
+    {% if request.user.ref_code %}
+        <div>Ваш код: {{request.user.ref_code}}</div>
+    {% else %}
+        <div>Вы уже выдавали код!</div>
+    {% endif %}
+{% endif %}
+<div class="Exit">Exit: <a href='{% url "logout" %}'>Exit</a></div>
+<div class="Back">Back: <a href='{% url "home" %}'>Back</a></div>
+
+{% endif %}
+
+<script>
+
+    head = document.querySelector(".head");
+
+    head.hidden = true
+
+</script>
+
+{% endblock %}

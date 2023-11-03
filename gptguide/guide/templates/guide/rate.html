@@ -1,0 +1,98 @@
+{% extends "guide/base.html" %}
+{% load static %}
+{% load guide_tags %}
+
+{% block content %}
+
+<div class="main">
+    <div class="ai-container"><img class="ai" alt="" src="{% static 'guide/images/ai.png' %}"></img></div>
+    <div class="rate-container">
+        <div class="rate-text">Тарифный план</div>
+        {% if request.user.is_authenticated and not request.user.ref_signUp %}
+            <div class="code"><a class="code-a" href='{% url "ref" %}'>Указать код друга</a></div>
+        {% else %}
+            <div class="code"><a class="code-a" href='#'>Вы уже указали код!</a></div>
+        {% endif %}
+    </div>
+    <div class="table-container">
+        <table class="flex-table">
+            {% for r in rate %}
+                <tr class="check">
+                    {% if request.user.discount == 0 %}
+                        <td><input autocomplete="off" type="checkbox" value="{{r.cost}}" id="{{r.id}}" name="box" class="box" class="box"></td>
+                        <td><div class="text">{{r.name}}</div></td>
+                        <td><div class="cost">{{r.cost}} ₽</div></td>
+                    {% else %}
+                        <td><input autocomplete="off" type="checkbox" value="{{r.cost}}" id="{{r.id}}" name="box" class="box" class="box"></td>
+                        <td><div class="text">{{r.name}}</div></td>
+                        <td><div class="cost">{% new_cost r.cost request.user.discount %} ₽</div></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="ability-container">
+            <div class="ability">Возможности</div>
+            <div class="code1"><a class="code-a" href="#">Указать код друга</a></div>
+        </div>
+        <div class="big-function">
+            <div class="function-container">
+                <div>
+                    <img class="f-img" src="{% static 'guide/images/communication.png' %}" alt="">
+                    <div class="f-div">Общение без ограничений</div>
+                </div>
+                <div>
+                    <img class="f-img" src="{% static 'guide/images/voice.png' %}" alt="">
+                    <div class="f-div">Голосовые сообщения</div>
+                </div>
+                <div>
+                    <img class="f-img" src="{% static 'guide/images/union.png' %}" alt="">
+                    <div class="f-div">Придумать турмаршрут</div>
+                </div>
+                <div>
+                    <img class="f-img" src="{% static 'guide/images/time.png' %}" alt="">
+                    <div class="f-div">Найти место отдыха</div>
+                </div>
+            </div>
+        </div>
+        <div class="send-btn-container">
+            <form action="{% url 'rate' %}" id="save" method="post">
+                {% csrf_token %}
+                <button class="send-pay">Оплатить 0</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        let boxes = document.querySelectorAll(".box");
+        let sendPay = document.querySelector(".send-pay");
+        let data = '';
+
+        boxes.forEach(box => box.addEventListener("change", function (e) {
+            data = box.id;
+            sendPay.innerHTML = `Оплатить ${box.value}`;
+        }))
+
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $("#save").submit(function () {
+                $.ajax({
+                    data: {
+                        id: data,
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    },
+                    type: "POST",
+                    url: "",
+                })
+            })
+        })
+
+    </script>
+
+{% endblock %}

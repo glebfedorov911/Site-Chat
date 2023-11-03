@@ -1,0 +1,16 @@
+{% extends "guide/base.html" %}
+
+{% block content %}
+
+<a href="{% url 'home' %}">Домой</a>
+<h1>Ваш код: {{code}}</h1>
+
+<script>
+
+    head = document.querySelector(".head");
+
+    head.hidden = true
+
+</script>
+
+{% endblock %}

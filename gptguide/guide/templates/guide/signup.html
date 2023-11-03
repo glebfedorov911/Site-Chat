@@ -1,0 +1,19 @@
+{% extends "guide/base.html" %}
+
+{% block content %}
+
+<form action="{% url 'signup' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Ввод</button>
+</form>
+
+<script>
+
+    head = document.querySelector(".head");
+
+    head.hidden = true
+
+</script>
+
+{% endblock %}

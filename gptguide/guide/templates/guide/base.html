@@ -1,0 +1,73 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title}}</title>
+    <link type="text/css" href="{% static 'guide/css/styles.css' %}" rel="stylesheet">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!--	<link rel="shortcut icon" href="{% static 'guide/images/.png' %}" type="image/x-icon">-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+{% block mainmenu %}
+{% endblock mainmenu %}
+
+<div class="head">
+    <img src="{% static 'guide/images/Mask group.svg' %}" alt="" class="mask">
+    <img src="{% static 'guide/images/cross.png' %}" alt="" class="cross">
+    {% if not request.user.is_authenticated %}
+        <div hidden class="auth-container">
+            <div class="link"><a href="{% url 'signup' %}">Регистрация</a></div>
+            <div class="link"><a href="{% url 'login' %}">Вход</a></div>
+            <div class="cross">x</div>
+        </div>
+    {% else %}
+        <div hidden class="auth-container">
+            <div class="link"><a href="{% url 'user' request.user.id %}">Личный кабинет</a></div>
+            <div class="link"><a href="{% url 'rate' %}">Тариф</a></div>
+            <div class="link"><a href="{% url 'ref' %}">Рефералка</a></div>
+            <div class="link"><a href="{% url 'logout' %}">Выход</a></div>
+        </div>
+    {% endif %}
+</div>
+
+{% block content %}
+{% endblock %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<script>
+
+    let mask = document.querySelector(".mask");
+    let authContainer = document.querySelector(".auth-container");
+
+    mask.addEventListener("click", function (e) {
+        if (authContainer.hidden) {
+            authContainer.hidden = false;
+        }
+        else {
+            authContainer.hidden = true;
+        }
+    })
+
+
+</script>
+
+<script>
+        $('input[type="checkbox"]').on('change', function() {
+            $('input[type="checkbox"]').not(this).prop('checked', false);
+        });
+</script>
+
+<script>
+    let cross = document.querySelector(".cross");
+
+    cross.addEventListener("click", function (e) {
+        window.location.href = "{% url 'home' %}";
+    });
+
+</script>
+
+</body>
+</html>

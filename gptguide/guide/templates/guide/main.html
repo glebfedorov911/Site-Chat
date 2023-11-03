@@ -1,0 +1,195 @@
+{% extends "guide/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="main">
+    <div class="ai-container">
+    {% if not adminEdit.avatar %}
+        <img class="ai" alt="" src="{% static 'guide/images/ai.png' %}">
+    {% else %}
+        <img class="ai" alt="" src="{{ adminEdit.avatar.url }}">
+    {% endif %}
+    </div>
+
+{% if request.user.is_authenticated %}
+
+    {% for m in msg %}
+        {% if m.audio %}
+            <div class="own">
+                <audio controls src="{{ m.audio.url }}"></audio>
+            </div>
+        {% else %}
+            {% if m.from_user.id == request.user.id %}
+                <div class="own">
+                    <div class="msg-own">
+                        <div class="msg-own-text">{{m.msg}}</div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="guest">
+                    <div class="msg-guest">
+                        <div class="msg-guest-text">{{m.msg}}</div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+        <div class="button-container">
+            <div class="btn1">Что умеешь?</div>
+            <div class="btn1">Партнерская программа!</div>
+            <div class="btn1">Новая функция</div>
+            <div class="btn1">Новая функция</div>
+            <div class="btn1">Новая функция</div>
+            <div class="btn1">Новая функция</div>
+        </div>
+
+        {% if not request.user.msg == 0 %}
+            <form action="{% url 'home' %}" method="post" id="msg">
+                {% csrf_token %}
+                <div class="send-container">
+                    {{form.as_p}}
+                    <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
+                    <div hidden class="send-micro"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></div>
+                    <div hidden class="send-btn-msg"><button type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
+                </div>
+            </form>
+        {% else %}
+            <div><a class="code-this" href='{% url "ref" %}'>Указать код друга</a></div>
+            <div><a class="code-this" href='{% url "rate" %}'>Тарифы</a></div>
+        {% endif %}
+
+
+
+{% else %}
+        <div class="guest">
+            <div class="msg-guest">
+                <div class="msg-guest-text">Hello, new user!</div>
+            </div>
+        </div>
+        <div class="guest">
+            <div class="msg-guest">
+                <div class="msg-guest-text"><div class="signup">Sign Up: <a href='{% url "signup" %}'>Sign Up</a><br>Login: <a href="{% url 'login' %}">Login</a></div></div>
+            </div>
+        </div>
+        {% if key_id != None %}
+            {% for m in msg1 %}
+                {% if m.key == key_id and m.from_user.username != "CHAT-BOT" %}
+                    <div class="own">
+                        <div class="msg-own">
+                            <div class="msg-own-text">{{m.msg}}</div>
+                        </div>
+                    </div>
+                {% elif m.from_user.username == "CHAT-BOT" %}
+                    <div class="guest">
+                        <div class="msg-guest">
+                            <div class="msg-guest-text">{{m.msg}}</div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        <form action="{% url 'home' %}" method="post" id="msg">
+            {% csrf_token %}
+            <div class="send-container">
+                {{form.as_p}}
+                {% if user.is_authenticated %}
+                    <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
+                {% endif %}
+                <div hidden class="send-btn-msg"><button type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
+            </div>
+        </form>
+    </div>
+
+
+{% endif %}
+
+
+<script>
+
+    let sendMsg = document.querySelector(".send-msg");
+    let micro = document.querySelector(".micro");
+    let sendBtnMsg = document.querySelector(".send-btn-msg");
+    let btns = document.querySelectorAll(".btn1");
+
+    function changeHidden(block) {
+        if (block.value != "") {
+            sendBtnMsg.hidden = false;
+            micro.hidden = true;
+        }
+        else {
+            sendBtnMsg.hidden = true;
+            micro.hidden = false;
+        }
+    }
+
+    sendMsg.addEventListener("input", function(e) {
+        changeHidden(sendMsg)
+    })
+
+    btns.forEach(btn => btn.addEventListener("click", function (e) {
+        sendMsg.value = btn.innerText;
+        changeHidden(sendMsg)
+    }))
+
+    window.scrollTo(0, document.body.scrollHeight);
+</script>
+
+<script>
+navigator.mediaDevices.getUserMedia({audio: true})
+    .then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        const micro = document.querySelector(".micro")
+        const sendMicro = document.querySelector(".send-micro")
+        const msg = document.querySelector(".send-msg");
+
+        micro.addEventListener("click", function () {
+            mediaRecorder.start();
+            micro.hidden = true;
+            sendMicro.hidden = false;
+            msg.hidden = true;
+        });
+
+        let audioChunks = [];
+        mediaRecorder.addEventListener("dataavailable", function (event) {
+            audioChunks.push(event.data);
+        });
+
+        mediaRecorder.addEventListener("stop", function () {
+            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            var audio = document.createElement("audio");
+            audio.src = audioUrl;
+            audio.controls = true;
+            audio.autoplay = false;
+            // document.querySelector("#audio").appendChild(audio);
+            audioChunks = [];
+
+            let fd = new FormData();
+            fd.append("audio", audioBlob)
+            fd.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
+
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: fd,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function () {
+                    window.location.href = ""
+                }
+            })
+
+        });
+
+        sendMicro.addEventListener("click", function () {
+            mediaRecorder.stop();
+            micro.hidden = false;
+            sendMicro.hidden = true;
+        });
+    })
+</script>
+
+{% endblock %}
+
