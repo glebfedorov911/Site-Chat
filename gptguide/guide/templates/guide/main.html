@@ -45,15 +45,15 @@
         </div>
 
         {% if not request.user.msg == 0 %}
+            <div class="send-container">
             <form action="{% url 'home' %}" method="post" id="msg">
                 {% csrf_token %}
-                <div class="send-container">
-                    {{form.as_p}}
-                    <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
-                    <div hidden class="send-micro"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></div>
-                    <div hidden class="send-btn-msg"><button type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
-                </div>
+                {{form.as_p}}
             </form>
+                <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
+                <div hidden class="send-micro"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></div>
+                <div hidden class="send-btn-msg"><button id="sendmsg" type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
+            </div>
         {% else %}
             <div><a class="code-this" href='{% url "ref" %}'>Указать код друга</a></div>
             <div><a class="code-this" href='{% url "rate" %}'>Тарифы</a></div>
@@ -89,21 +89,20 @@
                 {% endif %}
             {% endfor %}
         {% endif %}
+        <div class="send-container">
         <form action="{% url 'home' %}" method="post" id="msg">
             {% csrf_token %}
-            <div class="send-container">
-                {{form.as_p}}
-                {% if user.is_authenticated %}
-                    <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
-                {% endif %}
-                <div hidden class="send-btn-msg"><button type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
-            </div>
+            {{form.as_p}}
         </form>
+        {% if user.is_authenticated %}
+            <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
+        {% endif %}
+        <div hidden class="send-btn-msg"><button id="sendmsg" type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
+        </div>
     </div>
 
 
 {% endif %}
-
 
 <script>
 
@@ -136,59 +135,78 @@
 </script>
 
 <script>
-navigator.mediaDevices.getUserMedia({audio: true})
-    .then(stream => {
-        const mediaRecorder = new MediaRecorder(stream);
-        const micro = document.querySelector(".micro")
-        const sendMicro = document.querySelector(".send-micro")
-        const msg = document.querySelector(".send-msg");
+    navigator.mediaDevices.getUserMedia({audio: true})
+        .then(stream => {
+            const mediaRecorder = new MediaRecorder(stream);
+            const micro = document.querySelector(".micro")
+            const sendMicro = document.querySelector(".send-micro")
+            const msg = document.querySelector(".send-msg");
 
-        micro.addEventListener("click", function () {
-            mediaRecorder.start();
-            micro.hidden = true;
-            sendMicro.hidden = false;
-            msg.hidden = true;
-        });
+            micro.addEventListener("click", function () {
+                mediaRecorder.start();
+                micro.hidden = true;
+                sendMicro.hidden = false;
+                msg.hidden = true;
+            });
 
-        let audioChunks = [];
-        mediaRecorder.addEventListener("dataavailable", function (event) {
-            audioChunks.push(event.data);
-        });
+            let audioChunks = [];
+            mediaRecorder.addEventListener("dataavailable", function (event) {
+                audioChunks.push(event.data);
+            });
 
-        mediaRecorder.addEventListener("stop", function () {
-            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            var audio = document.createElement("audio");
-            audio.src = audioUrl;
-            audio.controls = true;
-            audio.autoplay = false;
-            // document.querySelector("#audio").appendChild(audio);
-            audioChunks = [];
+            mediaRecorder.addEventListener("stop", function () {
+                const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                var audio = document.createElement("audio");
+                audio.src = audioUrl;
+                audio.controls = true;
+                audio.autoplay = false;
+                // document.querySelector("#audio").appendChild(audio);
+                audioChunks = [];
 
-            let fd = new FormData();
-            fd.append("audio", audioBlob)
-            fd.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
+                let fd = new FormData();
+                fd.append("audio", audioBlob)
+                fd.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
 
-            $.ajax({
-                type: "POST",
-                url: "",
-                data: fd,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function () {
-                    window.location.href = ""
-                }
-            })
+                $.ajax({
+                    type: "POST",
+                    url: "",
+                    data: fd,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function () {
+                        location.reload();
+                    }
+                })
 
-        });
+            });
 
-        sendMicro.addEventListener("click", function () {
-            mediaRecorder.stop();
-            micro.hidden = false;
-            sendMicro.hidden = true;
-        });
-    })
+            sendMicro.addEventListener("click", function () {
+                mediaRecorder.stop();
+                micro.hidden = false;
+                sendMicro.hidden = true;
+            });
+        })
+
+    sbtn = document.querySelector("#sendmsg");
+    sbtn.addEventListener("click", function () {
+        let fd = new FormData();
+        fd.append("msg", $('input[name=msg]').val())
+        fd.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
+
+        $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function () {
+                location.reload();
+            }
+        })
+})
 </script>
 
 {% endblock %}

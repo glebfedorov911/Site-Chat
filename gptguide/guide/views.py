@@ -33,7 +33,6 @@ class MainPage(CreateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        print(self.request.FILES.get("audio"))
         try:
             if not self.request.FILES.get("audio") is None:
                 user = UserCustomModel.objects.filter(id=request.user.id)
@@ -44,11 +43,8 @@ class MainPage(CreateView):
                 msg_obj.save()
 
                 chat_answer("Голосовое сообщение", user[0], chat)
-        except:
-            return redirect("error")
 
-        try:
-            if self.request.user.username == "":
+            elif self.request.user.username == "":
                 chat = UserCustomModel.objects.get(username="CHAT-BOT")
 
                 if "msg" not in self.request.session:
@@ -67,14 +63,20 @@ class MainPage(CreateView):
                     chat_answer("Зарегистрируйтесь или авторизуйтесь чтобы продолжить!", self.request.session["id"], chat,
                                 True)
 
-                return redirect("home")
-        except:
-            redirect("error")
+            # if not is_ajax(self.request):
+            #     user = UserCustomModel.objects.filter(id=request.user.id)
+            #     user.update(msg=user[0].msg-1)
+            #     chat = UserCustomModel.objects.get(username="CHAT-BOT")
+            #     msg = request.POST.get("msg")
+            #
+            #     msg_obj = Message.objects.create(from_user=user[0], to_user=chat, msg=msg)
+            #     msg_obj.save()
+            #
+            #     chat_answer(msg, user[0], chat)
 
-        try:
-            if not is_ajax(self.request):
+            elif is_ajax(self.request):
                 user = UserCustomModel.objects.filter(id=request.user.id)
-                user.update(msg=user[0].msg-1)
+                user.update(msg=user[0].msg - 1)
                 chat = UserCustomModel.objects.get(username="CHAT-BOT")
                 msg = request.POST.get("msg")
 
@@ -82,7 +84,6 @@ class MainPage(CreateView):
                 msg_obj.save()
 
                 chat_answer(msg, user[0], chat)
-
         except:
             return redirect("error")
 
