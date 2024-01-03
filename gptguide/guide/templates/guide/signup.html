@@ -5,6 +5,7 @@
 <form action="{% url 'signup' %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
+    <div id="btn_show_pass">show password</div>
     <button type="submit">Ввод</button>
 </form>
 
@@ -15,5 +16,7 @@
     head.hidden = true
 
 </script>
+
+
 
 {% endblock %}

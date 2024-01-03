@@ -16,13 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 from . import settings
-from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("guide/", include("guide.urls")),
+    path('guide/reset_password/', auth_views.PasswordResetView.as_view(),
+         name ='reset_password'),
+    path('guide/reset_password_sent/', auth_views.PasswordResetDoneView.as_view(),
+         name ='password_reset_done'),
+    path('guide/reset/<uidb64>/<token>', auth_views.PasswordResetConfirmView.as_view(),
+          name ='password_reset_confirm'),
+    path('guide/reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(),
+         name ='password_reset_complete'),
 ]
 
 if settings.DEBUG:

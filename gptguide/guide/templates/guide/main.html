@@ -17,18 +17,21 @@
         {% if m.audio %}
             <div class="own">
                 <audio controls src="{{ m.audio.url }}"></audio>
+                <div class="msg-own-text">{{m.date_create}}</div>
             </div>
         {% else %}
             {% if m.from_user.id == request.user.id %}
                 <div class="own">
                     <div class="msg-own">
                         <div class="msg-own-text">{{m.msg}}</div>
+                        <div class="msg-own-text">{{m.date_create}}</div>
                     </div>
                 </div>
             {% else %}
                 <div class="guest">
                     <div class="msg-guest">
                         <div class="msg-guest-text">{{m.msg}}</div>
+                        <div class="msg-guest-text">{{m.date_create}}</div>
                     </div>
                 </div>
             {% endif %}
@@ -45,15 +48,15 @@
         </div>
 
         {% if not request.user.msg == 0 %}
-            <div class="send-container">
             <form action="{% url 'home' %}" method="post" id="msg">
+            <div class="send-container">
                 {% csrf_token %}
                 {{form.as_p}}
-            </form>
                 <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
                 <div hidden class="send-micro"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></div>
                 <div hidden class="send-btn-msg"><button id="sendmsg" type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
             </div>
+            </form>
         {% else %}
             <div><a class="code-this" href='{% url "ref" %}'>Указать код друга</a></div>
             <div><a class="code-this" href='{% url "rate" %}'>Тарифы</a></div>
@@ -78,27 +81,29 @@
                     <div class="own">
                         <div class="msg-own">
                             <div class="msg-own-text">{{m.msg}}</div>
+                            <div class="msg-own-text">{{m.date_create}}</div>
                         </div>
                     </div>
                 {% elif m.from_user.username == "CHAT-BOT" %}
                     <div class="guest">
                         <div class="msg-guest">
                             <div class="msg-guest-text">{{m.msg}}</div>
+                            <div class="msg-guest-text">{{m.date_create}}</div>
                         </div>
                     </div>
                 {% endif %}
             {% endfor %}
         {% endif %}
-        <div class="send-container">
         <form action="{% url 'home' %}" method="post" id="msg">
+            <div class="send-container">
             {% csrf_token %}
             {{form.as_p}}
+            {% if user.is_authenticated %}
+                <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
+            {% endif %}
+            <div hidden class="send-btn-msg"><button id="sendmsg" type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
+            </div>
         </form>
-        {% if user.is_authenticated %}
-            <div class="micro"><img src="{% static 'guide/images/Group 2.svg' %}" alt=""></div>
-        {% endif %}
-        <div hidden class="send-btn-msg"><button id="sendmsg" type="submit"><img src="{% static 'guide/images/pngwing.com.png' %}" alt=""></button></div>
-        </div>
     </div>
 
 
@@ -191,21 +196,21 @@
 
     sbtn = document.querySelector("#sendmsg");
     sbtn.addEventListener("click", function () {
-        let fd = new FormData();
-        fd.append("msg", $('input[name=msg]').val())
-        fd.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
+    let fd = new FormData();
+    fd.append("msg", $('input[name=msg]').val())
+    fd.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
 
-        $.ajax({
-            type: "POST",
-            url: "",
-            data: fd,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function () {
-                location.reload();
-            }
-        })
+    // $.ajax({
+    //     type: "POST",
+    //     url: "",
+    //     data: fd,
+    //     cache: false,
+    //     contentType: false,
+    //     processData: false,
+    //     success: function () {
+    //         location.reload();
+    //     }
+    // })
 })
 </script>
 

@@ -5,7 +5,13 @@
 {% block content %}
 
 <div class="main">
-    <div class="ai-container"><img class="ai" alt="" src="{% static 'guide/images/ai.png' %}"></img></div>
+        <div class="ai-container">
+    {% if not adminEdit.avatar %}
+        <img class="ai" alt="" src="{% static 'guide/images/ai.png' %}">
+    {% else %}
+        <img class="ai" alt="" src="{{ adminEdit.avatar.url }}">
+    {% endif %}
+    </div>
     <div class="rate-container">
         <div class="rate-text">Тарифный план</div>
         {% if request.user.is_authenticated and not request.user.ref_signUp %}
@@ -23,7 +29,7 @@
                         <td><div class="text">{{r.name}}</div></td>
                         <td><div class="cost">{{r.cost}} ₽</div></td>
                     {% else %}
-                        <td><input autocomplete="off" type="checkbox" value="{{r.cost}}" id="{{r.id}}" name="box" class="box" class="box"></td>
+                        <td><input autocomplete="off" type="checkbox" value="{% new_cost r.cost request.user.discount %}" id="{{r.id}}" name="box" class="box" class="box"></td>
                         <td><div class="text">{{r.name}}</div></td>
                         <td><div class="cost">{% new_cost r.cost request.user.discount %} ₽</div></td>
                     {% endif %}
@@ -58,7 +64,7 @@
         <div class="send-btn-container">
             <form action="{% url 'rate' %}" id="save" method="post">
                 {% csrf_token %}
-                <button class="send-pay">Оплатить 0</button>
+                <button class="send-pay">Оплатить</button>
             </form>
         </div>
     </div>
@@ -71,7 +77,7 @@
 
         boxes.forEach(box => box.addEventListener("change", function (e) {
             data = box.id;
-            sendPay.innerHTML = `Оплатить ${box.value}`;
+            sendPay.innerHTML = `Оплатить`;
         }))
 
     </script>

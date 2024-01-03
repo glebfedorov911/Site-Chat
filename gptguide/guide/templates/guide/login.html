@@ -6,8 +6,10 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+    <div id="btn_show_pass">show password</div>
     <button type="submit">Войти</button>
 </form>
+<a href="{% url 'reset_password' %}">Восстановить пароль</a>
 
 <script>
 
@@ -16,5 +18,7 @@
     head.hidden = true
 
 </script>
+
+
 
 {% endblock %}

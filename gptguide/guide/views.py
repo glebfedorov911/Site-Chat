@@ -36,6 +36,7 @@ class MainPage(CreateView):
         try:
             if not self.request.FILES.get("audio") is None:
                 user = UserCustomModel.objects.filter(id=request.user.id)
+                user.update(msg=user[0].msg-1)
                 chat = UserCustomModel.objects.get(username="CHAT-BOT")
 
                 path = default_storage.save('audio/file' + '.wav', ContentFile(self.request.FILES.get("audio").read()))
@@ -51,7 +52,7 @@ class MainPage(CreateView):
                     self.request.session['msg'] = 3
                     self.request.session['id'] = randomword()
 
-                if not self.request.session.get("msg") == 0:
+                if not self.request.session.get("msg") <= 0:
                     self.request.session['msg'] -= 1
 
                     msg = Message.objects.create(key=self.request.session["id"], to_user=chat,
@@ -63,20 +64,9 @@ class MainPage(CreateView):
                     chat_answer("Зарегистрируйтесь или авторизуйтесь чтобы продолжить!", self.request.session["id"], chat,
                                 True)
 
-            # if not is_ajax(self.request):
-            #     user = UserCustomModel.objects.filter(id=request.user.id)
-            #     user.update(msg=user[0].msg-1)
-            #     chat = UserCustomModel.objects.get(username="CHAT-BOT")
-            #     msg = request.POST.get("msg")
-            #
-            #     msg_obj = Message.objects.create(from_user=user[0], to_user=chat, msg=msg)
-            #     msg_obj.save()
-            #
-            #     chat_answer(msg, user[0], chat)
-
-            elif is_ajax(self.request):
+            elif not self.request.POST.get("msg") is None:
                 user = UserCustomModel.objects.filter(id=request.user.id)
-                user.update(msg=user[0].msg - 1)
+                user.update(msg=user[0].msg-1)
                 chat = UserCustomModel.objects.get(username="CHAT-BOT")
                 msg = request.POST.get("msg")
 
@@ -84,6 +74,17 @@ class MainPage(CreateView):
                 msg_obj.save()
 
                 chat_answer(msg, user[0], chat)
+
+        # elif is_ajax(self.request):
+        #     user = UserCustomModel.objects.filter(id=request.user.id)
+        #     user.update(msg=user[0].msg - 1)
+        #     chat = UserCustomModel.objects.get(username="CHAT-BOT")
+        #     msg = request.POST.get("msg")
+        #
+        #     msg_obj = Message.objects.create(from_user=user[0], to_user=chat, msg=msg)
+        #     msg_obj.save()
+        #
+            # chat_answer(msg, user[0], chat)
         except:
             return redirect("error")
 
@@ -155,7 +156,7 @@ class RefPage(TemplateView):
         refcode = self.request.POST.get("refcode")
         try:
 
-            if not ( self.request.user.id == UserCustomModel.objects.filter(ref_code=refcode)[0].id ):
+            if not (self.request.user.id == UserCustomModel.objects.filter(ref_code=refcode)[0].id):
 
                 UserCustomModel.objects.filter(ref_code=refcode).update(ref=True, discount=20, ref_code="")
                 user = UserCustomModel.objects.filter(username=self.request.user.username)
@@ -193,9 +194,7 @@ class RatePage(ListView):
         return context
 
     def post(self, request, *args, **kwargs):
-        if is_ajax(self.request):
-
-            id = self.request.POST.get("id")
+        id = self.request.POST.get("id") # два получения стоимости и работы, сделать проверку на none
 
         return redirect("home")
 

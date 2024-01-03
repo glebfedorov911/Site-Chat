@@ -69,5 +69,23 @@
 
 </script>
 
+<script>
+    const password1 = document.querySelector("#id_password1");
+    const password2 = document.querySelector("#id_password2");
+    const password = document.querySelector("#id_password");
+    const showPass = document.querySelector("#btn_show_pass");
+
+    showPass.addEventListener("click", function (e) {
+        if (!(password1 == null && password2  == null)) {
+            password1.type = (password1.type == "text") ? "password" : "text";
+            password2.type = (password2.type == "text") ? "password" : "text";
+        }
+        else {
+            password.type = (password.type == "text") ? "password" : "text";
+        }
+        showPass.innerHTML = (showPass.innerHTML == "hide password") ? "show password" : "hide password";
+    })
+</script>
+
 </body>
 </html>

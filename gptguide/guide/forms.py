@@ -9,7 +9,7 @@ class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = UserCustomModel
-        fields = ["username", "password1", "password2"]
+        fields = ["username", "email", "password1", "password2"]
 
 class RefForm(forms.Form):
     refcode = forms.CharField(max_length=8)
